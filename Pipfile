@@ -5,9 +5,11 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+autopep8 = "*"
 
 [packages]
 bpy = "*"
+mathutils = "*"
 
 [requires]
 python_version = "3.6"

@@ -1,3 +1,5 @@
+import sys
+import os
 import bpy
 import colorsys
 import math
@@ -6,7 +8,6 @@ from mathutils import Euler
 tau = 2*pi
 
 # Check if script is opened in Blender program
-import os, sys
 
 
 def createSphere(origin=(0, 0, 0)):
@@ -14,6 +15,7 @@ def createSphere(origin=(0, 0, 0)):
     bpy.ops.mesh.primitive_ico_sphere_add(location=origin)
     obj = bpy.context.object
     return obj
+
 
 def removeAll(type=None):
     # Possible type: ‘MESH’, ‘CURVE’, ‘SURFACE’, ‘META’, ‘FONT’, ‘ARMATURE’, ‘LATTICE’, ‘EMPTY’, ‘CAMERA’, ‘LAMP’
@@ -25,6 +27,7 @@ def removeAll(type=None):
         # Remove all elements in scene
         bpy.ops.object.select_by_layer()
         bpy.ops.object.delete(use_global=False)
+
 
 def rainbowLights(r=5, n=100, freq=2, energy=0.1):
     for i in range(n):
@@ -43,6 +46,7 @@ def rainbowLights(r=5, n=100, freq=2, energy=0.1):
         obj.data.color = color
         obj.data.energy = energy
 
+
 def setSmooth(obj, level=None, smooth=True):
     if level:
         # Add subsurf modifier
@@ -54,6 +58,7 @@ def setSmooth(obj, level=None, smooth=True):
     mesh = obj.data
     for p in mesh.polygons:
         p.use_smooth = smooth
+
 
 if __name__ == '__main__':
     # Remove all elements

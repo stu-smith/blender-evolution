@@ -1,0 +1,1 @@
+del test-output.png ; pipenv run python -m src.render --input .\test-input.json --output C:\git\blender-evolution\test-output.png --resolution 500x500

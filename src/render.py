@@ -70,6 +70,15 @@ def read_triple(value, kind, input_ref):
         raise Exception('Cannot read {} at: {}.'.format(kind, input_ref))
 
 
+def read_float(value, kind, input_ref):
+    if not isinstance(value, (int, float)):
+        raise Exception(
+            'Value for {} must be numeric at: {}.'.format(
+                kind, input_ref)
+        )
+    return value
+
+
 def blender_setup():
     #
     # Blender seems to start with some objects already in scene, so remove all elements first.
@@ -115,6 +124,10 @@ def blender_lights(input):
             input_light['location'], 'HSV', 'lights/{}/location'.format(
                 str(idx))
         )
+        input_light_energy = read_float(
+            input_light['energy'], 'energy', 'lights/{}/energy'.format(
+                str(idx))
+        )
 
         #
         # Create lamp.
@@ -127,7 +140,62 @@ def blender_lights(input):
 
         # Set HSV color and lamp energy.
         obj.data.color = color
-        obj.data.energy = 0.1
+        obj.data.energy = input_light_energy
+
+
+def blender_sphere(input_object, input_ref):
+    sphere_location = read_triple(
+        input_object['location'], 'location', '{}/location'.format(input_ref)
+    )
+    sphere_size = read_float(
+        input_object['size'], 'size', '{}/size'.format(input_ref)
+    )
+    bpy.ops.mesh.primitive_ico_sphere_add(
+        location=sphere_location, size=sphere_size
+    )
+    obj = bpy.context.object
+    return obj
+
+
+def blender_modifiers(blender_obj, input_obj, input_ref):
+    if 'smooth' in input_obj:
+        input_smooth = read_float(
+            input_obj['smooth'], 'smooth', '{}/smooth'.format(input_ref)
+        )
+
+        modifier = blender_obj.modifiers.new('Subsurf', 'SUBSURF')
+        modifier.levels = input_smooth
+        modifier.render_levels = input_smooth
+
+        for poly in blender_obj.data.polygons:
+            poly.use_smooth = True
+
+
+def blender_objects(input):
+    type_dict = {
+        'sphere': blender_sphere
+    }
+
+    input_objects = input['objects']
+
+    if not input_objects:
+        raise Exception('No objects defined.')
+
+    for idx, input_object in enumerate(input_objects):
+        input_object_type = input_object['type']
+        input_ref = 'objects/{}[{}]'.format(idx, input_object_type)
+
+        if not input_object_type in type_dict:
+            raise Exception(
+                'Unknown object type "{}" at: {}.'.format(
+                    input_object_type, input_ref)
+            )
+
+        object_fn = type_dict[input_object_type]
+
+        blender_obj = object_fn(input_object, input_ref)
+
+        blender_modifiers(blender_obj, input_object, input_ref)
 
 
 def blender_render(input, output_file, width, height):
@@ -164,6 +232,7 @@ def main():
     blender_setup()
     blender_camera(input)
     blender_lights(input)
+    blender_objects(input)
     blender_render(input, args.output, resolution_width, resolution_height)
 
 

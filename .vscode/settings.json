@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": "C:\\Users\\stusm\\.virtualenvs\\blender-evolution-3qX95axL\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\stusm\\.virtualenvs\\blender-evolution-3qX95axL\\Scripts\\python.exe",
+    "cSpell.words": [
+        "colorsys",
+        "mathutils",
+        "pylint"
+    ]
 }

@@ -1,13 +1,25 @@
 {
     "camera": {
-        "location": [0, -3.5, 0],
+        "location": [0, -10, 0],
         "rotation": [1.57, 0, 0]
     },
     "lights": [{
-        "location": [-10, 0, 10],
-        "hsv": [0, 1, 1]
+        "location": [-5, 0, 10],
+        "hsv": [0, 1, 1],
+        "energy": 1
     }, {
-        "location": [-10, 0, 10],
-        "hsv": [0.6, 1, 1]
+        "location": [5, 0, 10],
+        "hsv": [0.6, 1, 1],
+        "energy": 1
+    }],
+    "objects": [{
+        "type": "sphere",
+        "location": [-2.5, 0, 0],
+        "size": 2
+    }, {
+        "type": "sphere",
+        "location": [2.5, 0, 0],
+        "size": 2,
+        "smooth": 3
     }]
 }

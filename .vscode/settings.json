@@ -3,6 +3,8 @@
     "cSpell.words": [
         "colorsys",
         "mathutils",
-        "pylint"
+        "pipenv",
+        "pylint",
+        "tkinter"
     ]
 }

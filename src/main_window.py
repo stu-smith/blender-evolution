@@ -1,6 +1,7 @@
 import time
 from tkinter import Frame, Menu, Label
 
+from .evolution_step import EvolutionStep
 from .evolution_step_view import EvolutionStepView
 
 
@@ -23,8 +24,6 @@ class MainWindow(Frame):
         self.init_menus()
         self.init_grid()
 
-        self.timer_tick()
-
     def init_menus(self):
         menubar = Menu(self._master)
         self._master.config(menu=menubar)
@@ -37,7 +36,7 @@ class MainWindow(Frame):
     def init_grid(self):
         grid = Frame(self)
 
-        grid.grid(row=0, column=0, sticky="nsew")
+        grid.grid(row=0, column=0, sticky="nsew")  # spell-checker: ignore nsew
 
         for row in range(0, 3):
             grid.grid_rowconfigure(row, weight=1)
@@ -56,12 +55,9 @@ class MainWindow(Frame):
 
         Label(grid, text='20').grid(row=2, column=0)
         Label(grid, text='21').grid(row=2, column=1)
-        EvolutionStepView(grid).grid(row=2, column=2)
+        esv = EvolutionStepView(grid)
+        esv.grid(row=2, column=2)
+        esv.set_evolution_step(EvolutionStep())
 
     def client_exit(self):
         exit()
-
-    def timer_tick(self):
-        now = time.strftime("%H:%M:%S")
-        self._label.configure(text=now)
-        self._master.after(1000, self.timer_tick)

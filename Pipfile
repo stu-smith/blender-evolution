@@ -9,7 +9,6 @@ autopep8 = "*"
 
 [packages]
 bpy = "*"
-mathutils = "*"
 
 [requires]
 python_version = "3.6"

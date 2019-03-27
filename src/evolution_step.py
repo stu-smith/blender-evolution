@@ -18,6 +18,9 @@ class EvolutionStep(object):
     def __init__(self):
         self._state = EvolutionStepState.not_started
         self._tempdir = tempfile.TemporaryDirectory()
+        self._render_width = None
+        self._render_height = None
+        self._destroyed = False
 
         threading.Thread(target=self._process).start()
 
@@ -29,10 +32,15 @@ class EvolutionStep(object):
     def output_image_path(self):
         return self._output_path
 
+    def set_render_size(self, width, height):
+        self._render_width = width
+        self._render_height = height
+
     def destroy(self):
         if self._tempdir:
             self._tempdir.cleanup()
             self._tempdir = None
+        self._destroyed = True
 
     def _process(self):
         time.sleep(2)
@@ -88,11 +96,20 @@ class EvolutionStep(object):
     def _render(self, input_path):
         output_path = os.path.join(self._tempdir.name, 'output.png')
 
+        while self._render_width is None or self._render_height is None:
+            if self._destroyed:
+                return
+            time.sleep(0.1)
+
+        if self._destroyed:
+            return
+
         args = [
             'pipenv', 'run', 'python', '-m', 'src.render',
             '--input', input_path,
             '--output', output_path,
-            '--resolution', '200x200'
+            '--resolution', '{}x{}'.format(self._render_width,
+                                           self._render_height)
         ]
 
         subprocess.call(args)

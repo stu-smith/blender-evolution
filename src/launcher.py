@@ -1,11 +1,11 @@
-from tkinter import Tk, TclError
+import tkinter as tk
 
 from .main_window import MainWindow
 
 
 def main():
-    root = Tk()
-    root.geometry('800x800')
+    root = tk.Tk()
+    root.state('zoomed')
     root.option_add('*tearOff', False)
     app = MainWindow(master=root)
 
@@ -13,7 +13,7 @@ def main():
 
     try:
         root.destroy()
-    except TclError:
+    except tk.TclError:
         pass
 
 

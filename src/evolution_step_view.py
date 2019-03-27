@@ -1,19 +1,17 @@
-from tkinter import Canvas, Frame, Label, PhotoImage, NW
+import tkinter as tk
 
 from .evolution_step import EvolutionStepState
-from .tkinter_png.tkinter_png import *
+from .tkinter_png.tkinter_png import PngImageTk
 
 
-class EvolutionStepView(Frame):
+class EvolutionStepView(tk.Frame):
 
-    def __init__(self, parent):
-        Frame.__init__(self, parent)
+    def __init__(self, parent, width, height):
+        tk.Frame.__init__(self, parent, width=width, height=height, bg='red')
 
         self._parent = parent
-
-        self.grid(row=0, column=0, sticky="nsew")  # spell-checker: ignore nsew
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self._width = width
+        self._height = height
 
         self._evolution_step = None
         self._last_state = None
@@ -29,6 +27,10 @@ class EvolutionStepView(Frame):
         self._show_state()
 
         if self._evolution_step:
+            self.update()
+            width = self.winfo_width()
+            height = self.winfo_height()
+            self._evolution_step.set_render_size(width, height)
             self._timer_tick()
 
     def _remove_all(self):
@@ -70,18 +72,19 @@ class EvolutionStepView(Frame):
         self._remove_all()
         img = PngImageTk(self._evolution_step.output_image_path)
         img.convert()
-        canvas = Canvas(self, width=200, height=200)
-        canvas.grid(row=0, column=0)
-        canvas.create_image(0, 0, anchor=NW, image=img.image)
+        canvas = tk.Canvas(self)
+        canvas.place(x=0, y=0, width=self._width, height=self._height)
+        canvas.create_image(0, 0, anchor=tk.NW, image=img.image)
         # Need to keep a reference to the image:
         # http://effbot.org/tkinterbook/photoimage.htm
         canvas.image = img.image
 
     def _show_label(self, text):
         self._remove_all()
-        label = Label(self, text=text)
-        label.grid(row=0, column=0)
-        label.configure(background='green')
+        canvas = tk.Canvas(self)
+        canvas.place(x=0, y=0, width=self._width, height=self._height)
+        canvas.create_text(self._width / 2, self._height / 2, fill="darkblue",
+                           font="Times 20 italic bold", text=text)
 
     def _timer_tick(self):
         self._show_state()

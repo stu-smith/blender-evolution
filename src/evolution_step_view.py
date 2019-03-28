@@ -16,7 +16,19 @@ class EvolutionStepView(tk.Frame):
         self._evolution_step = None
         self._last_state = None
 
+        self._canvas = tk.Canvas(self)
+
         self._show_state()
+
+    def set_size(self, width, height):
+        self._width = width
+        self._height = height
+        self._last_state = 'FORCE_RESIZE'
+        self._show_state()
+
+        if self._evolution_step:
+            self._evolution_step.set_render_size(width, height)
+            self._timer_tick()
 
     def set_evolution_step(self, evolution_step):
         if self._evolution_step:
@@ -27,17 +39,8 @@ class EvolutionStepView(tk.Frame):
         self._show_state()
 
         if self._evolution_step:
-            self.update()
-            width = self.winfo_width()
-            height = self.winfo_height()
-            self._evolution_step.set_render_size(width, height)
+            self._evolution_step.set_render_size(self._width, self._height)
             self._timer_tick()
-
-    def _remove_all(self):
-        all_widgets = list(self.children.values())
-
-        for widget in all_widgets:
-            widget.destroy()
 
     def _show_state(self):
         if self._evolution_step:
@@ -69,22 +72,23 @@ class EvolutionStepView(tk.Frame):
             self._last_state = None
 
     def _show_image(self, image_path):
-        self._remove_all()
         img = PngImageTk(self._evolution_step.output_image_path)
         img.convert()
-        canvas = tk.Canvas(self)
-        canvas.place(x=0, y=0, width=self._width, height=self._height)
-        canvas.create_image(0, 0, anchor=tk.NW, image=img.image)
+
+        self._canvas.delete('all')
+        self._canvas.place(x=0, y=0, width=self._width, height=self._height)
+        self._canvas.create_image(0, 0, anchor=tk.NW, image=img.image)
         # Need to keep a reference to the image:
         # http://effbot.org/tkinterbook/photoimage.htm
-        canvas.image = img.image
+        self._canvas.image = img.image
 
     def _show_label(self, text):
-        self._remove_all()
-        canvas = tk.Canvas(self)
-        canvas.place(x=0, y=0, width=self._width, height=self._height)
-        canvas.create_text(self._width / 2, self._height / 2, fill="darkblue",
-                           font="Times 20 italic bold", text=text)
+        self._canvas.delete('all')
+        self._canvas.place(x=0, y=0, width=self._width, height=self._height)
+        self._canvas.create_text(
+            self._width / 2, self._height / 2, fill="darkblue",
+            font="Times 20 italic bold", text=text
+        )
 
     def _timer_tick(self):
         self._show_state()

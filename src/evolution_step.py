@@ -6,6 +6,8 @@ import tempfile
 import threading
 import time
 
+# spellchecker:ignore isfile
+
 
 class EvolutionStepState(Enum):
     not_started = 0,
@@ -36,6 +38,9 @@ class EvolutionStep(object):
         self._render_width = width
         self._render_height = height
 
+        if self._state == EvolutionStepState.done:
+            threading.Thread(target=self._process_render_only).start()
+
     def destroy(self):
         if self._tempdir:
             self._tempdir.cleanup()
@@ -48,12 +53,22 @@ class EvolutionStep(object):
         self._state = EvolutionStepState.mutating
         time.sleep(3)
         json_dict = self._generate_json()
-        input_path = self._write_json(json_dict)
-        print('input_path: ' + input_path)
+        self._input_path = self._write_json(json_dict)
+        print('input_path: ' + self._input_path)
 
+        self._process_render_only()
+
+    def _process_render_only(self):
         self._state = EvolutionStepState.rendering
-        self._output_path = self._render(input_path)
-        print('output_path: ' + self._output_path)
+
+        while True:
+            self._start_render_width = self._render_width
+            self._start_render_height = self._render_height
+            self._output_path = self._render(self._input_path)
+            print('output_path: ' + self._output_path)
+
+            if self._start_render_width == self._render_width and self._start_render_height == self._render_height:
+                break
 
         self._state = EvolutionStepState.done
 
@@ -95,6 +110,9 @@ class EvolutionStep(object):
 
     def _render(self, input_path):
         output_path = os.path.join(self._tempdir.name, 'output.png')
+
+        if os.path.isfile(output_path):
+            os.remove(output_path)
 
         while self._render_width is None or self._render_height is None:
             if self._destroyed:

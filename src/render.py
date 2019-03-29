@@ -57,13 +57,15 @@ def read_triple(value, kind, input_ref):
         if len(value) != 3:
             raise Exception(
                 'Expected exactly three {} components at: {}.'.format(
-                    kind, input_ref)
+                    kind, input_ref
+                )
             )
         for v in value:
             if not isinstance(v, (int, float)):
                 raise Exception(
                     'Values for {} must be numeric at: {}.'.format(
-                        kind, input_ref)
+                        kind, input_ref
+                    )
                 )
         return (value[0], value[1], value[2])
     else:
@@ -73,22 +75,36 @@ def read_triple(value, kind, input_ref):
 def read_float(value, kind, input_ref):
     if not isinstance(value, (int, float)):
         raise Exception(
-            'Value for {} must be numeric at: {}.'.format(
-                kind, input_ref)
+            'Value for {} must be numeric at: {}.'.format(kind, input_ref)
         )
     return value
 
 
-def blender_setup():
+def read_int(value, kind, input_ref):
+    if not isinstance(value, int):
+        raise Exception(
+            'Value for {} must be integer at: {}.'.format(kind, input_ref)
+        )
+    return value
+
+
+def blender_setup(input):
     #
     # Blender seems to start with some objects already in scene, so remove all elements first.
     bpy.ops.object.select_by_layer()
     bpy.ops.object.delete(use_global=False)
 
+    input_settings = input['settings']
+
+    samples = read_int(
+        input_settings['samples'], 'samples', 'settings/samples'
+    )
+
     scene = bpy.data.scenes['Scene']
     scene.world.use_nodes = True
-    scene.world.node_tree.nodes['Background'].inputs['Color'].default_value = (
-        0.0, 0.0, 0.0, 0.0)
+    scene.cycles.samples = samples
+    background_node = scene.world.node_tree.nodes['Background']
+    background_node.inputs['Color'].default_value = (0.0, 0.0, 0.0, 0.0)
 
 
 def blender_camera(input):
@@ -239,7 +255,7 @@ def main():
 
     input = load_input(args.input)
 
-    blender_setup()
+    blender_setup(input)
     blender_camera(input)
     blender_lights(input)
     blender_objects(input)

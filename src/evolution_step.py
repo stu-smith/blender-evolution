@@ -72,6 +72,9 @@ class EvolutionStep(object):
 
     def _generate_json(self):
         json_dict = {
+            "settings": {
+                "samples": 10
+            },
             "camera": {
                 "location": [0, -10, 0],
                 "rotation": [1.57, 0, 0]

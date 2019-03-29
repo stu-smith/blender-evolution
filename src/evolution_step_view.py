@@ -3,6 +3,8 @@ import tkinter as tk
 from .evolution_step import EvolutionStepState
 from .tkinter_png.tkinter_png import PngImageTk
 
+# spellchecker:ignore Arial
+
 
 class EvolutionStepView(tk.Frame):
 
@@ -17,6 +19,7 @@ class EvolutionStepView(tk.Frame):
         self._last_state = None
 
         self._canvas = tk.Canvas(self)
+        self._canvas.configure(background='#333')
 
         self._show_state()
 
@@ -50,13 +53,13 @@ class EvolutionStepView(tk.Frame):
                 new_state = self._evolution_step.state
 
                 if new_state == EvolutionStepState.not_started:
-                    self._show_label('Not started')
+                    self._show_label('not started')
 
                 elif new_state == EvolutionStepState.mutating:
-                    self._show_label('Mutating')
+                    self._show_label('mutating...')
 
                 elif new_state == EvolutionStepState.rendering:
-                    self._show_label('Rendering')
+                    self._show_label('rendering...')
 
                 if new_state == EvolutionStepState.done:
                     self._show_image(self._evolution_step.output_image_path)
@@ -68,7 +71,7 @@ class EvolutionStepView(tk.Frame):
                 pass
 
         else:
-            self._show_label('NONE')
+            self._show_label('')
             self._last_state = None
 
     def _show_image(self, image_path):
@@ -86,8 +89,8 @@ class EvolutionStepView(tk.Frame):
         self._canvas.delete('all')
         self._canvas.place(x=0, y=0, width=self._width, height=self._height)
         self._canvas.create_text(
-            self._width / 2, self._height / 2, fill="darkblue",
-            font="Times 20 italic bold", text=text
+            self._width / 2, self._height / 2, fill="white",
+            font="Arial 20", text=text
         )
 
     def _timer_tick(self):

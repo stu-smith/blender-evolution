@@ -54,7 +54,6 @@ class EvolutionStep(object):
         time.sleep(3)
         json_dict = self._generate_json()
         self._input_path = self._write_json(json_dict)
-        print('input_path: ' + self._input_path)
 
         self._process_render_only()
 
@@ -65,7 +64,6 @@ class EvolutionStep(object):
             self._start_render_width = self._render_width
             self._start_render_height = self._render_height
             self._output_path = self._render(self._input_path)
-            print('output_path: ' + self._output_path)
 
             if self._start_render_width == self._render_width and self._start_render_height == self._render_height:
                 break
@@ -81,11 +79,11 @@ class EvolutionStep(object):
             "lights": [{
                 "location": [-5, 0, 10],
                 "hsv": [0, 1, 1],
-                "energy": 1
+                "energy": 10000
             }, {
                 "location": [5, 0, 10],
                 "hsv": [0.6, 1, 1],
-                "energy": 1
+                "energy": 10000
             }],
             "objects": [{
                 "type": "sphere",

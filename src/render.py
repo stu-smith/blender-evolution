@@ -85,6 +85,11 @@ def blender_setup():
     bpy.ops.object.select_by_layer()
     bpy.ops.object.delete(use_global=False)
 
+    scene = bpy.data.scenes['Scene']
+    scene.world.use_nodes = True
+    scene.world.node_tree.nodes['Background'].inputs['Color'].default_value = (
+        0.0, 0.0, 0.0, 0.0)
+
 
 def blender_camera(input):
     #
@@ -131,16 +136,19 @@ def blender_lights(input):
 
         #
         # Create lamp.
-        bpy.ops.object.add(type='LAMP', location=input_light_location)
+        bpy.ops.object.lamp_add(type='POINT', location=input_light_location)
         obj = bpy.context.object
         obj.data.type = 'POINT'
 
         # Apply gamma correction for Blender.
-        color = tuple(pow(c, 2.2) for c in colorsys.hsv_to_rgb(hue, sat, val))
+        color_list = [pow(c, 2.2) for c in colorsys.hsv_to_rgb(hue, sat, val)]
+        color_list.append(1.0)
+        color = tuple(color_list)
 
         # Set HSV color and lamp energy.
-        obj.data.color = color
-        obj.data.energy = input_light_energy
+        obj.data.use_nodes = True
+        obj.data.node_tree.nodes['Emission'].inputs['Strength'].default_value = input_light_energy
+        obj.data.node_tree.nodes['Emission'].inputs['Color'].default_value = color
 
 
 def blender_sphere(input_object, input_ref):
@@ -199,7 +207,9 @@ def blender_objects(input):
 
 
 def blender_render(input, output_file, width, height):
-    rnd = bpy.data.scenes['Scene'].render
+    scene = bpy.data.scenes['Scene']
+    rnd = scene.render
+    rnd.engine = 'CYCLES'
     rnd.resolution_x = width
     rnd.resolution_y = height
     rnd.resolution_percentage = 100

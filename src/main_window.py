@@ -4,7 +4,7 @@ import tkinter as tk
 from .evolution_step import EvolutionStep
 from .evolution_step_view import EvolutionStepView
 
-# spellchecker:ignore winfo,NSEW
+# spellchecker:ignore tkinter,winfo,NSEW
 
 
 class MainWindow(tk.Frame):
@@ -72,7 +72,7 @@ class MainWindow(tk.Frame):
 
     def _place_views(self):
         #
-        # I just couldn't get tkinter's grid to do what I wanted.
+        # I just couldn't get the tkinter grid to do what I wanted.
         # That's a competency issue on my side, not anything wrong with tkinter.
         # So, I've fudged it with a manual layout system.
         #

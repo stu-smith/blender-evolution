@@ -6,6 +6,9 @@ import tempfile
 import threading
 import time
 
+from .genome.genome_expression import GenomeExpression
+from .visible_objects.sphere import Sphere
+
 # spellchecker:ignore isfile
 
 
@@ -71,34 +74,47 @@ class EvolutionStep(object):
         self._state = EvolutionStepState.done
 
     def _generate_json(self):
-        json_dict = {
-            "settings": {
-                "samples": 10
-            },
-            "camera": {
-                "location": [0, -10, 0],
-                "rotation": [1.57, 0, 0]
-            },
-            "lights": [{
-                "location": [-5, 0, 10],
-                "hsv": [0, 1, 1],
-                "energy": 10000
-            }, {
-                "location": [5, 0, 10],
-                "hsv": [0.6, 1, 1],
-                "energy": 10000
-            }],
-            "objects": [{
-                "type": "sphere",
-                "location": [-2.5, 0, 0],
-                "size": 2
-            }, {
-                "type": "sphere",
-                "location": [2.5, 0, 0],
-                "size": 2,
-                "smooth": 3
-            }]
-        }
+        genome_expression = GenomeExpression()
+        sphere_a = Sphere(location=[-2.5, 0, 0], size=2, smooth=3)
+        sphere_b = Sphere(location=[2.5, 0, 0], size=2, smooth=0)
+
+        genome_expression.add_object(sphere_a)
+        genome_expression.add_object(sphere_b)
+
+        json_dict = genome_expression.generate_render_dict()
+
+        json_dict['settings']['samples'] = 10
+
+        print(json.dumps(json_dict, indent=2))
+
+        # json_dict = {
+        #     "settings": {
+        #         "samples": 10
+        #     },
+        #     "camera": {
+        #         "location": [0, -10, 0],
+        #         "rotation": [1.57, 0, 0]
+        #     },
+        #     "lights": [{
+        #         "location": [-5, 0, 10],
+        #         "hsv": [0, 1, 1],
+        #         "energy": 10000
+        #     }, {
+        #         "location": [5, 0, 10],
+        #         "hsv": [0.6, 1, 1],
+        #         "energy": 10000
+        #     }],
+        #     "objects": [{
+        #         "type": "sphere",
+        #         "location": [-2.5, 0, 0],
+        #         "size": 2
+        #     }, {
+        #         "type": "sphere",
+        #         "location": [2.5, 0, 0],
+        #         "size": 2,
+        #         "smooth": 3
+        #     }]
+        # }
         return json_dict
 
     def _write_json(self, json_dict):

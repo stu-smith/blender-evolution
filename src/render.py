@@ -212,7 +212,8 @@ def blender_objects(input):
         if not input_object_type in type_dict:
             raise Exception(
                 'Unknown object type "{}" at: {}.'.format(
-                    input_object_type, input_ref)
+                    input_object_type, input_ref
+                )
             )
 
         object_fn = type_dict[input_object_type]

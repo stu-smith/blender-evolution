@@ -4,12 +4,19 @@ from abc import ABC, abstractmethod
 class VisibleObject(ABC):
 
     def __init__(self, **kwargs):
+        self._smooth = 0
+
+        attribute_mappings = {
+            'smooth': '_smooth'
+        }
+
         for key, value in kwargs.items():
-            if key == 'smooth':
-                self._smooth = value
-            elif key == 'dict':
-                if 'smooth' in value:
-                    self._smooth = dict['smooth']
+            for setting, attribute in attribute_mappings.items():
+                if key == setting:
+                    setattr(self, attribute, value)
+                elif key == 'dict':
+                    if setting in value:
+                        setattr(self, attribute, value[setting])
 
     @abstractmethod
     def aabb(self):

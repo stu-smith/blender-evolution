@@ -15,7 +15,7 @@ from math import pi
 from mathutils import Euler
 # pylint:enable=import-error
 
-tau = 2*pi
+from .visible_objects.visible_objects import visible_object_from_dict
 
 
 def parse_args():
@@ -167,60 +167,16 @@ def blender_lights(input):
         obj.data.node_tree.nodes['Emission'].inputs['Color'].default_value = color
 
 
-def blender_sphere(input_object, input_ref):
-    sphere_location = read_triple(
-        input_object['location'], 'location', '{}/location'.format(input_ref)
-    )
-    sphere_size = read_float(
-        input_object['size'], 'size', '{}/size'.format(input_ref)
-    )
-    bpy.ops.mesh.primitive_ico_sphere_add(
-        location=sphere_location, size=sphere_size
-    )
-    obj = bpy.context.object
-    return obj
-
-
-def blender_modifiers(blender_obj, input_obj, input_ref):
-    if 'smooth' in input_obj:
-        input_smooth = read_float(
-            input_obj['smooth'], 'smooth', '{}/smooth'.format(input_ref)
-        )
-
-        modifier = blender_obj.modifiers.new('Subsurf', 'SUBSURF')
-        modifier.levels = input_smooth
-        modifier.render_levels = input_smooth
-
-        for poly in blender_obj.data.polygons:
-            poly.use_smooth = True
-
-
 def blender_objects(input):
-    type_dict = {
-        'sphere': blender_sphere
-    }
-
     input_objects = input['objects']
 
     if not input_objects:
         raise Exception('No objects defined.')
 
-    for idx, input_object in enumerate(input_objects):
-        input_object_type = input_object['type']
-        input_ref = 'objects/{}[{}]'.format(idx, input_object_type)
+    for input_object in input_objects:
+        visible_object = visible_object_from_dict(input_object)
 
-        if not input_object_type in type_dict:
-            raise Exception(
-                'Unknown object type "{}" at: {}.'.format(
-                    input_object_type, input_ref
-                )
-            )
-
-        object_fn = type_dict[input_object_type]
-
-        blender_obj = object_fn(input_object, input_ref)
-
-        blender_modifiers(blender_obj, input_object, input_ref)
+        visible_object.to_bpy(bpy)
 
 
 def blender_render(input, output_file, width, height):

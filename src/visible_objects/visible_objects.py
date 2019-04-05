@@ -1,9 +1,11 @@
+from .mesh import Mesh
 from .sphere import Sphere
 
 
 def visible_object_from_dict(dict):
     constructors = {
-        'sphere': Sphere
+        'sphere': Sphere,
+        'mesh': Mesh
     }
 
     type_name = dict['type']

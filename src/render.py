@@ -173,10 +173,11 @@ def blender_objects(input):
     if not input_objects:
         raise Exception('No objects defined.')
 
-    for input_object in input_objects:
+    for idx, input_object in enumerate(input_objects):
         visible_object = visible_object_from_dict(input_object)
+        name_prefix = 'obj_{}_'.format(idx)
 
-        visible_object.to_bpy(bpy)
+        visible_object.to_bpy(bpy, name_prefix)
 
 
 def blender_render(input, output_file, width, height):

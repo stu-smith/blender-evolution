@@ -32,7 +32,9 @@ class GenomeExpression(object):
             json_objects = visible_object.to_json_objects()
             result['objects'] += json_objects
             visible_object_bounds = visible_object.aabb()
-            bounds = AABB.union(bounds, visible_object_bounds)
+
+            if not visible_object.ignore_for_camera_position:
+                bounds = AABB.union(bounds, visible_object_bounds)
 
         #
         # Arrange lights in a circle around the midpoint.
@@ -48,7 +50,7 @@ class GenomeExpression(object):
             result['lights'].append({
                 'location': [light_x, light_y, light_circle_z],
                 'hsv': [0, 0, 1],
-                'energy': 2000  # TODO: Compute based on light distance.
+                'energy': 1000  # TODO: Compute based on light distance.
             })
 
         #

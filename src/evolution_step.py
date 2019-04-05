@@ -8,6 +8,7 @@ import time
 
 from .genome.genome_expression import GenomeExpression
 from .visible_objects.sphere import Sphere
+from .visible_objects.mesh import Mesh
 
 # spellchecker:ignore isfile
 
@@ -79,8 +80,21 @@ class EvolutionStep(object):
         sphere_a = Sphere(location=[-2.5, 0, 0], size=2, smooth=3)
         sphere_b = Sphere(location=[2.5, 0, 0], size=2, smooth=0)
 
+        # TODO: Make ground part of genome, size to objects.
+        ground = Mesh(
+            vertexes=[
+                [-10, -10, -3],
+                [10, -10, -3],
+                [10, 10, -3],
+                [-10, 10, -3]
+            ],
+            faces=[[0, 1, 2, 3]],
+            ignore_for_camera_position=True
+        )
+
         genome_expression.add_object(sphere_a)
         genome_expression.add_object(sphere_b)
+        genome_expression.add_object(ground)
 
         json_dict = genome_expression.generate_render_dict()
 

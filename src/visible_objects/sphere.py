@@ -1,26 +1,23 @@
 from .visible_object import VisibleObject
-
 from ..aabb import AABB
 
 
 class Sphere(VisibleObject):
 
     def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            if key == 'location':
-                self._location = value
-            elif key == 'size':
-                self._size = value
-            elif key == 'smooth':
-                self._smooth = value
-            elif key == 'dict':
-                self._location = value['location']
-                self._size = value['size']
-                self._smooth = value['smooth']
-            else:
-                raise TypeError('Unknown argument "{}".'.format(key))
+        self._location = [0, 0, 0]
+        self._size = 2
 
-        super().__init__(**kwargs)
+        attribute_mappings = {
+            'location': {
+                'attribute': '_location'
+            },
+            'size': {
+                'attribute': '_size'
+            }
+        }
+
+        super().__init__(attribute_mappings, **kwargs)
 
     def aabb(self):
         (cx, cy, cz) = self._location
@@ -29,14 +26,15 @@ class Sphere(VisibleObject):
 
     def to_json_objects(self):
         (cx, cy, cz) = self._location
-        return [{
+        json = {
             'type': 'sphere',
             'location': [cx, cy, cz],
-            'size': self._size,
-            'smooth': self._smooth
-        }]
+            'size': self._size
+        }
+        json = {**json, **self.get_common_json_properties()}
+        return [json]
 
-    def to_bpy(self, bpy):
+    def to_bpy(self, bpy, name_prefix):
         bpy.ops.mesh.primitive_ico_sphere_add(
             location=self._location, size=self._size
         )

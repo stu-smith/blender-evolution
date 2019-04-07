@@ -50,7 +50,7 @@ class GenomeExpression(object):
             result['lights'].append({
                 'location': [light_x, light_y, light_circle_z],
                 'hsv': [0, 0, 1],
-                'energy': 1000  # TODO: Compute based on light distance.
+                'energy': 500  # TODO: Compute based on light distance.
             })
 
         #

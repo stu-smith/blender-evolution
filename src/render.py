@@ -99,10 +99,14 @@ def blender_setup(input):
     samples = read_int(
         input_settings['samples'], 'samples', 'settings/samples'
     )
+    max_bounces = read_int(
+        input_settings['max_bounces'], 'max_bounces', 'settings/max_bounces'
+    )
 
     scene = bpy.data.scenes['Scene']
     scene.world.use_nodes = True
     scene.cycles.samples = samples
+    scene.cycles.max_bounces = max_bounces
     background_node = scene.world.node_tree.nodes['Background']
     background_node.inputs['Color'].default_value = (0.0, 0.0, 0.0, 0.0)
 

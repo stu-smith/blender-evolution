@@ -99,7 +99,8 @@ class EvolutionStep(object):
         json_dict = genome_expression.generate_render_dict()
 
         # TODO: Preferences
-        json_dict['settings']['samples'] = 10
+        json_dict['settings']['samples'] = 20
+        json_dict['settings']['max_bounces'] = 8
 
         return json_dict
 

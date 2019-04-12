@@ -1,5 +1,6 @@
 from enum import Enum
 import json
+import math
 import os
 import subprocess
 import tempfile
@@ -9,6 +10,7 @@ import time
 from .genome.genome_expression import GenomeExpression
 from .visible_objects.sphere import Sphere
 from .visible_objects.mesh import Mesh
+from .lights.point_light import PointLight
 
 # spellchecker:ignore isfile
 
@@ -92,9 +94,27 @@ class EvolutionStep(object):
             ignore_for_camera_position=True
         )
 
-        genome_expression.add_object(sphere_a)
-        genome_expression.add_object(sphere_b)
-        genome_expression.add_object(ground)
+        genome_expression.add_visible_object(sphere_a)
+        genome_expression.add_visible_object(sphere_b)
+        genome_expression.add_visible_object(ground)
+
+        bounds = genome_expression.get_visible_object_bounds()
+
+        # TODO: Make lights part of genome.
+        light_count = 10
+        light_circle_radius = max(bounds.x2 - bounds.x1, bounds.y2 - bounds.y1)
+        light_circle_z = bounds.z2 + (bounds.z2 - bounds.z1) * 2
+
+        for light_index in range(0, light_count):
+            light_angle = light_index / light_count * math.pi * 2
+            light_x = math.cos(light_angle) * light_circle_radius
+            light_y = math.sin(light_angle) * light_circle_radius
+
+            light_location = [light_x, light_y, light_circle_z]
+            light = PointLight(location=light_location,
+                               hsv=[0, 0, 1], energy=500)
+
+            genome_expression.add_light(light)
 
         json_dict = genome_expression.generate_render_dict()
 

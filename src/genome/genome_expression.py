@@ -5,53 +5,49 @@ from mathutils import Vector
 # pylint:enable=import-error
 
 from ..aabb import AABB
+from ..camera import Camera
 
 
 class GenomeExpression(object):
 
     def __init__(self):
         self._visible_objects = []
+        self._lights = []
 
-    def add_object(self, visible_object):
+    def add_visible_object(self, visible_object):
         self._visible_objects.append(visible_object)
 
-    def generate_render_dict(self):
-        result = {
-            'settings': {},
-            'camera': {},
-            'lights': [],
-            'objects': []
-        }
+    def add_light(self, light):
+        self._lights.append(light)
 
+    def get_visible_object_bounds(self):
         bounds = None
 
-        #
-        # Convert visible objects to JSON objects.
-        # Also compute overall model bounds.
         for visible_object in self._visible_objects:
-            json_objects = visible_object.to_json_objects()
-            result['objects'] += json_objects
             visible_object_bounds = visible_object.aabb()
 
             if not visible_object.ignore_for_camera_position:
                 bounds = AABB.union(bounds, visible_object_bounds)
 
+        return bounds
+
+    def generate_render_dict(self):
+        bounds = self.get_visible_object_bounds()
+
+        objects_list = []
+        lights_list = []
+
         #
-        # Arrange lights in a circle around the midpoint.
-        light_count = 10
-        light_circle_radius = max(bounds.x2 - bounds.x1, bounds.y2 - bounds.y1)
-        light_circle_z = bounds.z2 + (bounds.z2 - bounds.z1) * 2
+        # Convert visible objects to JSON objects.
+        for visible_object in self._visible_objects:
+            json_object = visible_object.to_json_object()
+            objects_list.append(json_object)
 
-        for light_index in range(0, light_count):
-            light_angle = light_index / light_count * math.pi * 2
-            light_x = math.cos(light_angle) * light_circle_radius
-            light_y = math.sin(light_angle) * light_circle_radius
-
-            result['lights'].append({
-                'location': [light_x, light_y, light_circle_z],
-                'hsv': [0, 0, 1],
-                'energy': 500  # TODO: Compute based on light distance.
-            })
+        #
+        # Convert lights to JSON objects.
+        for light in self._lights:
+            json_object = light.to_json_object()
+            lights_list.append(json_object)
 
         #
         # Position camera.
@@ -67,7 +63,14 @@ class GenomeExpression(object):
 
         camera_rotation = rot_quat.to_euler()
 
-        result['camera']['location'] = list(camera_location)
-        result['camera']['rotation'] = list(camera_rotation)
+        camera = Camera(
+            location=camera_location[:], rotation=camera_rotation[:])
+
+        result = {
+            'settings': {},
+            'camera': camera.to_json_object(),
+            'lights': lights_list,
+            'objects': objects_list
+        }
 
         return result

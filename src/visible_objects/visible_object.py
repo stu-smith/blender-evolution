@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from ..renderable import Renderable
 
 
-class VisibleObject(ABC):
+class VisibleObject(Renderable):
 
-    def __init__(self, attribute_mappings, **kwargs):
+    def __init__(self, type, attribute_mappings, **kwargs):
         self._smooth = 0
         self._ignore_for_camera_position = False
 
@@ -20,30 +21,10 @@ class VisibleObject(ABC):
             **attribute_mappings, **common_attribute_mappings
         }
 
-        for key, value in kwargs.items():
-            found = False
-            for setting, attribute_dict in all_attribute_mappings.items():
-                attribute = attribute_dict['attribute']
-                if key == setting:
-                    setattr(self, attribute, value)
-                    found = True
-                elif key == 'dict':
-                    if setting in value:
-                        setattr(self, attribute, value[setting])
-                        found = True
-            if not found:
-                raise('Unknown parameter {}.'.format(key))
+        super().__init__(type, all_attribute_mappings, **kwargs)
 
     @abstractmethod
     def aabb(self):
-        pass
-
-    @abstractmethod
-    def to_json_objects(self):
-        pass
-
-    @abstractmethod
-    def to_bpy(self, bpy, name_prefix):
         pass
 
     def apply_common_bpy_properties(self, blender_obj):

@@ -15,7 +15,7 @@ from math import pi
 from mathutils import Euler
 # pylint:enable=import-error
 
-from .visible_objects.visible_objects import visible_object_from_dict
+from .renderables import renderable_from_dict
 
 
 def parse_args():
@@ -111,77 +111,23 @@ def blender_setup(input):
     background_node.inputs['Color'].default_value = (0.0, 0.0, 0.0, 0.0)
 
 
-def blender_camera(input):
-    #
-    # Read input values.
-    input_camera = input['camera']
-    input_camera_location = read_triple(
-        input_camera['location'], 'location', 'camera/location'
-    )
-    input_camera_rotation = read_triple(
-        input_camera['rotation'], 'Euler angles', 'camera/rotation'
-    )
+def blender_renderables(input):
+    kinds = ['camera', 'lights', 'objects']
 
-    #
-    # Create camera.
-    bpy.ops.object.add(type='CAMERA', location=input_camera_location)
-    cam = bpy.context.object
-    cam.rotation_euler = Euler(input_camera_rotation, 'XYZ')
+    for kind in kinds:
+        input_objects = input[kind]
 
-    #
-    # Make this the current camera
-    bpy.context.scene.camera = cam
+        if not isinstance(input_objects, list):
+            input_objects = [input_objects]
 
+        if not input_objects:
+            raise Exception('No {} defined.'.format(kind))
 
-def blender_lights(input):
-    #
-    # Read input values.
-    input_lights = input['lights']
+        for idx, input_object in enumerate(input_objects):
+            renderable = renderable_from_dict(input_object)
+            name_prefix = '{}_{}_'.format(kind, idx)
 
-    if not input_lights:
-        raise Exception('No lights defined.')
-
-    for idx, input_light in enumerate(input_lights):
-        (hue, sat, val) = read_triple(
-            input_light['hsv'], 'HSV', 'lights/{}/hsv'.format(str(idx))
-        )
-        input_light_location = read_triple(
-            input_light['location'], 'HSV', 'lights/{}/location'.format(
-                str(idx))
-        )
-        input_light_energy = read_float(
-            input_light['energy'], 'energy', 'lights/{}/energy'.format(
-                str(idx))
-        )
-
-        #
-        # Create lamp.
-        bpy.ops.object.lamp_add(type='POINT', location=input_light_location)
-        obj = bpy.context.object
-        obj.data.type = 'POINT'
-
-        # Apply gamma correction for Blender.
-        color_list = [pow(c, 2.2) for c in colorsys.hsv_to_rgb(hue, sat, val)]
-        color_list.append(1.0)
-        color = tuple(color_list)
-
-        # Set HSV color and lamp energy.
-        obj.data.use_nodes = True
-        obj.data.node_tree.nodes['Emission'].inputs['Strength'].default_value = input_light_energy
-        obj.data.node_tree.nodes['Emission'].inputs['Color'].default_value = color
-
-
-def blender_objects(input):
-    input_objects = input['objects']
-
-    if not input_objects:
-        raise Exception('No objects defined.')
-
-    for idx, input_object in enumerate(input_objects):
-        visible_object = visible_object_from_dict(input_object)
-        name_prefix = 'obj_{}_'.format(idx)
-
-        visible_object.to_bpy(bpy, name_prefix)
+            renderable.to_bpy(bpy, name_prefix)
 
 
 def blender_render(input, output_file, width, height):
@@ -218,9 +164,7 @@ def main():
     input = load_input(args.input)
 
     blender_setup(input)
-    blender_camera(input)
-    blender_lights(input)
-    blender_objects(input)
+    blender_renderables(input)
     blender_render(input, args.output, resolution_width, resolution_height)
 
 

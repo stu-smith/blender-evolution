@@ -4,6 +4,8 @@ from ..aabb import AABB
 
 class Sphere(VisibleObject):
 
+    TYPE = 'sphere'
+
     def __init__(self, **kwargs):
         self._location = [0, 0, 0]
         self._size = 2
@@ -17,22 +19,12 @@ class Sphere(VisibleObject):
             }
         }
 
-        super().__init__(attribute_mappings, **kwargs)
+        super().__init__(Sphere.TYPE, attribute_mappings, **kwargs)
 
     def aabb(self):
         (cx, cy, cz) = self._location
         r = self._size
         return AABB(cx - r, cx + r, cy - r, cy + r, cz - r, cz + r)
-
-    def to_json_objects(self):
-        (cx, cy, cz) = self._location
-        json = {
-            'type': 'sphere',
-            'location': [cx, cy, cz],
-            'size': self._size
-        }
-        json = {**json, **self.get_common_json_properties()}
-        return [json]
 
     def to_bpy(self, bpy, name_prefix):
         bpy.ops.mesh.primitive_ico_sphere_add(

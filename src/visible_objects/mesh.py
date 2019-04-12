@@ -1,8 +1,13 @@
 from .visible_object import VisibleObject
 from ..aabb import AABB
 
+# spellchecker:ignore pydata
+
 
 class Mesh(VisibleObject):
+
+    TYPE = 'mesh'
+
     def __init__(self, **kwargs):
         self._vertexes = []
         self._faces = []
@@ -16,7 +21,7 @@ class Mesh(VisibleObject):
             }
         }
 
-        super().__init__(attribute_mappings, **kwargs)
+        super().__init__(Mesh.TYPE, attribute_mappings, **kwargs)
 
     def aabb(self):
         bounds = None
@@ -31,15 +36,6 @@ class Mesh(VisibleObject):
 
         return bounds
 
-    def to_json_objects(self):
-        json = {
-            'type': 'mesh',
-            'vertexes': self._vertexes,
-            'faces': self._faces
-        }
-        json = {**json, **self.get_common_json_properties()}
-        return [json]
-
     def to_bpy(self, bpy, name_prefix):
         vertexes = [tuple(v) for v in self._vertexes]
         faces = [tuple(f) for f in self._faces]
@@ -52,10 +48,6 @@ class Mesh(VisibleObject):
 
         mesh.from_pydata(vertexes, [], faces)
         mesh.update(calc_edges=True)
-
-        # obj.location.x = px
-        # obj.location.y = py
-        # obj.location.z = pz
 
         super().apply_common_bpy_properties(obj)
 

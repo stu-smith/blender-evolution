@@ -1,6 +1,7 @@
 import time
 import tkinter as tk
 
+from .configuration import Configuration
 from .evolution_step import EvolutionStep
 from .evolution_step_view import EvolutionStepView
 
@@ -11,6 +12,7 @@ class MainWindow(tk.Frame):
 
     def __init__(self, master):
         tk.Frame.__init__(self, master)
+        self._configuration = Configuration()
         self._master = master
         self.init_window()
         self._last_width = None
@@ -50,10 +52,12 @@ class MainWindow(tk.Frame):
         width_third = int(width / 3)
         height_third = int(height / 3)
 
+        evolution_step = EvolutionStep(self._configuration)
+
         self._center_view = EvolutionStepView(
             container, width_third, height_third
         )
-        self._center_view.set_evolution_step(EvolutionStep())
+        self._center_view.set_evolution_step(evolution_step)
 
         self._outer_views = []
 

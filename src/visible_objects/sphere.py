@@ -32,6 +32,6 @@ class Sphere(VisibleObject):
         )
         obj = bpy.context.object
 
-        super().apply_common_bpy_properties(obj)
+        super().apply_common_bpy_properties(bpy, obj, name_prefix)
 
         return obj

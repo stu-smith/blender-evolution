@@ -4,5 +4,5 @@ from abc import ABC, abstractmethod
 class GeneProperty(ABC):
 
     @abstractmethod
-    def mutate(self):
+    def mutate(self, configuration):
         pass

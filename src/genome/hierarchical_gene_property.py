@@ -5,7 +5,7 @@ from .gene_property import GeneProperty
 
 class HierarchicalGeneProperty(GeneProperty):
 
-    def mutate(self):
+    def mutate(self, configuration):
         pass
 
     @abstractmethod

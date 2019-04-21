@@ -49,6 +49,6 @@ class Mesh(VisibleObject):
         mesh.from_pydata(vertexes, [], faces)
         mesh.update(calc_edges=True)
 
-        super().apply_common_bpy_properties(obj)
+        super().apply_common_bpy_properties(bpy, obj, name_prefix)
 
         return obj

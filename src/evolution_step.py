@@ -23,12 +23,13 @@ class EvolutionStepState(Enum):
 
 
 class EvolutionStep(object):
-    def __init__(self):
+    def __init__(self, configuration):
         self._state = EvolutionStepState.not_started
         self._tempdir = tempfile.TemporaryDirectory()
         self._render_width = None
         self._render_height = None
         self._destroyed = False
+        self._configuration = configuration
 
         threading.Thread(target=self._process).start()
 
@@ -80,7 +81,8 @@ class EvolutionStep(object):
         # TODO: Generate from genome.
         genome_expression = GenomeExpression()
         sphere_a = Sphere(location=[-2.5, 0, 0], size=2, smooth=3)
-        sphere_b = Sphere(location=[2.5, 0, 0], size=2, smooth=0)
+        sphere_b = Sphere(location=[2.5, 0, 0],
+                          size=2, smooth=0, hsv=[0, 1, 1])
 
         # TODO: Make ground part of genome, size to objects.
         ground = Mesh(
@@ -118,9 +120,8 @@ class EvolutionStep(object):
 
         json_dict = genome_expression.generate_render_dict()
 
-        # TODO: Preferences
-        json_dict['settings']['samples'] = 20
-        json_dict['settings']['max_bounces'] = 8
+        json_dict['settings']['samples'] = self._configuration.cycles_samples
+        json_dict['settings']['max_bounces'] = self._configuration.cycles_max_bounces
 
         return json_dict
 

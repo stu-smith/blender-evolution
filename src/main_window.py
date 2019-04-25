@@ -5,6 +5,8 @@ from .configuration import Configuration
 from .evolution_step import EvolutionStep
 from .evolution_step_view import EvolutionStepView
 
+from .genome.genome import Genome
+
 # spellchecker:ignore tkinter,winfo,NSEW
 
 
@@ -52,7 +54,10 @@ class MainWindow(tk.Frame):
         width_third = int(width / 3)
         height_third = int(height / 3)
 
-        evolution_step = EvolutionStep(self._configuration)
+        genome = Genome()
+        evolution_step = EvolutionStep(
+            self._configuration, genome, do_mutate=False
+        )
 
         self._center_view = EvolutionStepView(
             container, width_third, height_third

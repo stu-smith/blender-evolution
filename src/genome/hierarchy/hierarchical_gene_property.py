@@ -1,10 +1,11 @@
+from abc import abstractmethod
 import random
 
 from ..gene_property import GeneProperty
-from .circle_white_point_lights import CircleWhitePointLightsGene
+from ..visibles.sphere_gene import SphereGene
 
 
-class LightingGeneProperty(GeneProperty):
+class HierarchicalGeneProperty(GeneProperty):
 
     def __init__(self):
         self._gene = random.choice(self.available_types())()
@@ -14,7 +15,7 @@ class LightingGeneProperty(GeneProperty):
 
     def available_types(self):
         return [
-            CircleWhitePointLightsGene
+            SphereGene
         ]
 
     @property

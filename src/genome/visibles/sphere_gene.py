@@ -6,6 +6,7 @@ from ...visible_objects.sphere import Sphere
 
 
 class SphereGene(Gene):
+
     def __init__(self):
         self._size_property = ScalarGeneProperty(min=0.1, max=20, value=2)
         self._color_property = ColorGeneProperty(hsv=[0.0, 0.0, 1.0])
@@ -19,6 +20,7 @@ class SphereGene(Gene):
     def express(self, genome_expression):
         location = [0, 0, 0]  # TODO genome_expression stack position
         size = self._size_property.value
-        sphere = Sphere(location=location, size=size)
-        # TODO color
+        hsv = self._color_property.value
+
+        sphere = Sphere(location=location, size=size, hsv=hsv)
         genome_expression.add_visible_object(sphere)

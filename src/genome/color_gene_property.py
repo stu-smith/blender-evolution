@@ -8,6 +8,10 @@ class ColorGeneProperty(GeneProperty):
     def __init__(self, hsv):
         self._hsv = hsv
 
+    @property
+    def value(self):
+        return self._hsv
+
     def mutate(self, configuration):
         if random.random() < configuration.p_color_mutation:
             sigma = configuration.color_sigma

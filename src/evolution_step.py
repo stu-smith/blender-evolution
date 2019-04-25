@@ -23,13 +23,16 @@ class EvolutionStepState(Enum):
 
 
 class EvolutionStep(object):
-    def __init__(self, configuration):
+
+    def __init__(self, configuration, genome, do_mutate=True):
         self._state = EvolutionStepState.not_started
         self._tempdir = tempfile.TemporaryDirectory()
         self._render_width = None
         self._render_height = None
         self._destroyed = False
         self._configuration = configuration
+        self._genome = genome
+        self._do_mutate = do_mutate
 
         threading.Thread(target=self._process).start()
 
@@ -55,10 +58,10 @@ class EvolutionStep(object):
         self._destroyed = True
 
     def _process(self):
-        time.sleep(2)
+        if self._do_mutate:
+            self._state = EvolutionStepState.mutating
+            self._genome.mutate()
 
-        self._state = EvolutionStepState.mutating
-        time.sleep(3)
         json_dict = self._generate_json()
         self._input_path = self._write_json(json_dict)
 
@@ -78,11 +81,7 @@ class EvolutionStep(object):
         self._state = EvolutionStepState.done
 
     def _generate_json(self):
-        # TODO: Generate from genome.
-        genome_expression = GenomeExpression()
-        sphere_a = Sphere(location=[-2.5, 0, 0], size=2, smooth=3)
-        sphere_b = Sphere(location=[2.5, 0, 0],
-                          size=2, smooth=0, hsv=[0, 1, 1])
+        genome_expression = self._genome.express()
 
         # TODO: Make ground part of genome, size to objects.
         ground = Mesh(
@@ -96,27 +95,7 @@ class EvolutionStep(object):
             ignore_for_camera_position=True
         )
 
-        genome_expression.add_visible_object(sphere_a)
-        genome_expression.add_visible_object(sphere_b)
         genome_expression.add_visible_object(ground)
-
-        bounds = genome_expression.get_visible_object_bounds()
-
-        # TODO: Make lights part of genome.
-        light_count = 10
-        light_circle_radius = max(bounds.x2 - bounds.x1, bounds.y2 - bounds.y1)
-        light_circle_z = bounds.z2 + (bounds.z2 - bounds.z1) * 2
-
-        for light_index in range(0, light_count):
-            light_angle = light_index / light_count * math.pi * 2
-            light_x = math.cos(light_angle) * light_circle_radius
-            light_y = math.sin(light_angle) * light_circle_radius
-
-            light_location = [light_x, light_y, light_circle_z]
-            light = PointLight(location=light_location,
-                               hsv=[0, 0, 1], energy=500)
-
-            genome_expression.add_light(light)
 
         json_dict = genome_expression.generate_render_dict()
 

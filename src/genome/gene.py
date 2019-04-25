@@ -6,9 +6,11 @@ class Gene(ABC):
     def all_properties(self):
         pass
 
-    @abstractmethod
     def mutate(self, configuration):
-        pass
+        properties = self.all_properties()
+
+        for property in properties:
+            property.mutate(configuration)
 
     @abstractmethod
     def express(self, genome_expression):

@@ -36,5 +36,6 @@ class PointLight(Light):
         color = tuple(color_list)
 
         obj.data.use_nodes = True
-        obj.data.node_tree.nodes['Emission'].inputs['Strength'].default_value = self._energy
-        obj.data.node_tree.nodes['Emission'].inputs['Color'].default_value = color
+        emission_node = obj.data.node_tree.nodes['Emission']
+        emission_node.inputs['Strength'].default_value = self._energy
+        emission_node.inputs['Color'].default_value = color

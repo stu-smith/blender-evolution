@@ -24,6 +24,6 @@ class CircleWhitePointLightsGene(Gene):
             light_location = [light_x, light_y, light_circle_z]
             light = PointLight(location=light_location,
                                hsv=[0, 0, 1],
-                               energy=500)
+                               energy=200)
 
             genome_expression.add_light(light)

@@ -2,10 +2,10 @@ class Configuration(object):
     def __init__(self):
         self._cycles_samples = 20
         self._cycles_max_bounces = 8
-        self._p_scalar_mutation = 0.1
+        self._p_scalar_mutation = 0.2
         self._scalar_range_sigma = 0.1
-        self._p_color_mutation = 0.1
-        self._color_sigma = 0.1
+        self._p_color_mutation = 0.5
+        self._color_sigma = 0.5
 
     @property
     def cycles_samples(self):

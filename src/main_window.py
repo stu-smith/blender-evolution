@@ -1,3 +1,4 @@
+import copy
 import time
 import tkinter as tk
 
@@ -54,15 +55,10 @@ class MainWindow(tk.Frame):
         width_third = int(width / 3)
         height_third = int(height / 3)
 
-        genome = Genome()
-        evolution_step = EvolutionStep(
-            self._configuration, genome, do_mutate=False
-        )
-
         self._center_view = EvolutionStepView(
             container, width_third, height_third
         )
-        self._center_view.set_evolution_step(evolution_step)
+        self._center_view.bind('<Button-1>', self._view_click)
 
         self._outer_views = []
 
@@ -72,9 +68,12 @@ class MainWindow(tk.Frame):
                     # Center of grid is special and has already been done.
                     continue
                 view = EvolutionStepView(container, width_third, height_third)
+                view.bind('<Button-1>', self._view_click)
                 self._outer_views.append(view)
 
         self._place_views()
+
+        self._select_genome(Genome())
 
     def _client_exit(self):
         exit()
@@ -125,3 +124,31 @@ class MainWindow(tk.Frame):
             self._place_views()
 
         self.after(200, self._resize_timer_tick)
+
+    def _view_click(self, event):
+        evolution_step = event.widget.evolution_step
+
+        if not evolution_step:
+            return
+
+        genome = evolution_step.genome
+
+        if not genome:
+            return
+
+        self._select_genome(genome)
+
+    def _select_genome(self, genome):
+        genome_copy = copy.deepcopy(genome)
+
+        evolution_step = EvolutionStep(
+            self._configuration, genome_copy, do_mutate=False
+        )
+
+        self._center_view.set_evolution_step(evolution_step)
+
+        for view in self._outer_views:
+            genome_copy = copy.deepcopy(genome)
+            evolution_step = EvolutionStep(self._configuration, genome_copy)
+
+            view.set_evolution_step(evolution_step)

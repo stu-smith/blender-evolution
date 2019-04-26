@@ -21,7 +21,13 @@ class EvolutionStepView(tk.Frame):
         self._canvas = tk.Canvas(self)
         self._canvas.configure(background='#333')
 
+        self._canvas.bind('<Button-1>', self._click)
+
         self._show_state()
+
+    @property
+    def evolution_step(self):
+        return self._evolution_step
 
     def set_size(self, width, height):
         self._width = width
@@ -53,15 +59,19 @@ class EvolutionStepView(tk.Frame):
                 new_state = self._evolution_step.state
 
                 if new_state == EvolutionStepState.not_started:
+                    self._canvas.config(cursor='')
                     self._show_label('not started')
 
                 elif new_state == EvolutionStepState.mutating:
+                    self._canvas.config(cursor='wait')
                     self._show_label('mutating...')
 
                 elif new_state == EvolutionStepState.rendering:
+                    self._canvas.config(cursor='wait')
                     self._show_label('rendering...')
 
                 if new_state == EvolutionStepState.done:
+                    self._canvas.config(cursor='hand2')
                     self._show_image(self._evolution_step.output_image_path)
 
                 self._last_state = new_state
@@ -73,6 +83,7 @@ class EvolutionStepView(tk.Frame):
         else:
             self._show_label('')
             self._last_state = None
+            self._canvas.config(cursor='')
 
     def _show_image(self, image_path):
         img = PngImageTk(self._evolution_step.output_image_path)
@@ -98,3 +109,6 @@ class EvolutionStepView(tk.Frame):
 
         if self._evolution_step and self._evolution_step.state != EvolutionStepState.done:
             self._parent.after(1000, self._timer_tick)
+
+    def _click(self, event):
+        self.event_generate('<Button-1>')

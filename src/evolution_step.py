@@ -44,6 +44,10 @@ class EvolutionStep(object):
     def output_image_path(self):
         return self._output_path
 
+    @property
+    def genome(self):
+        return self._genome
+
     def set_render_size(self, width, height):
         self._render_width = width
         self._render_height = height
@@ -60,7 +64,7 @@ class EvolutionStep(object):
     def _process(self):
         if self._do_mutate:
             self._state = EvolutionStepState.mutating
-            self._genome.mutate()
+            self._genome.mutate(self._configuration)
 
         json_dict = self._generate_json()
         self._input_path = self._write_json(json_dict)
